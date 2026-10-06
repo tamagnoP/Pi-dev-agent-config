@@ -1,6 +1,21 @@
-# Pi-dev-config
+# My Pi personal configuration
 
-Configuration repository for the Pi agent: system prompt addendum, reusable skills, and documentation templates. I currently use this set of skills and templates for the development of research oriented data analysis workflows and pipelines implemented in Python.
+This repository contains only my personal configuration for the Pi agent: system prompt addendum, reusable skills, and documentation templates.
+
+I currently use this set of skills and templates for the development of research oriented data analysis workflows and pipelines implemented in Python.
+
+[!NOTE]
+**Credits:** All credit for the core system, framework, and agent logic belongs entirely to the **Pi Development Team**. This repository is solely for sharing my personal setup and how I use their tool.
+
+## Official Repository & Tool
+
+To find the official implementation,please visit the official project page:
+* **Official Harness:** [earendil-works/pi](https://github.com)
+
+## Installation Quick-Start
+
+If you want to replicate this setup, make sure you have the official agent installed globally according to the steps described in the official repo.
+Then, you can clone this repository and symlink or copy these files into your local `~/.pi/` directory.
 
 ## Structure
 
