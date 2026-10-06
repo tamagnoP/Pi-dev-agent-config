@@ -10,7 +10,7 @@ I currently use this set of skills and templates for the development of research
 ## Official Repository & Tool
 
 To find the official implementation,please visit the official project page:
-* **Official Harness:** [earendil-works/pi](https://github.com)
+* **Official Harness:** [pi](https://github.com/earendil-works/pi)
 
 ## Installation Quick-Start
 
