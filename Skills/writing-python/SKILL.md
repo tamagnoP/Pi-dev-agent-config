@@ -101,12 +101,64 @@ These five rules override any convenience shortcut. Check them first when review
 - **Write it once, write it short.** Prefer the shortest version that stays obvious: comprehensions over accumulator loops, direct returns over temporary variables that are used once, standard-library and pandas/numpy built-ins over hand-rolled loops. Stop shortening the moment the code stops being obvious.
 - **Cut the ceremony.** No getters/setters, no one-line wrapper functions that only call another function, no defensive re-validation of values already validated in `load_config`, no dead parameters, no unused "for later" hooks (YAGNI).
 - **Keep changes focused.** One refactor or feature per change; don't mix unrelated edits.
-- **Docstrings and comments explain *why*.** Add a docstring when a function or module needs explanation of its behavior or contract. Comments explain decisions, not restate the code.
+- **Docstrings and comments explain *why*.** Every function, class and module has a docstring, and it explains the mechanism or the reason for the approach — not the result. Comments explain decisions, not restate the code. See §6.1 for the required structure.
 - **Don't pessimize.** Avoid obviously wasteful patterns (loading whole files when streaming works, quadratic loops over large data) but never add complexity for speculative performance gains.
 - **Formatting is automated.** Ruff handles both linting and formatting, configured in `pyproject.toml`. Before finishing any task, run:
   ```bash
   ruff check --fix . && ruff format .
   ```
+
+### 6.1 Docstring structure
+
+PEP 257 form: triple double-quotes, a one-line summary, a blank line, then the body.
+
+**Every function and class docstring carries explicit `Parameters:` and `Returns:` sections**, naming the type and the purpose of each entry. Add a `Raises:` section whenever a failure is part of the contract — which, in this architecture, means any function that can raise `ConfigError` or `DataError`.
+
+The summary and body explain *how* the code works or *why* that approach was chosen. A docstring that only restates the return value is the anti-pattern:
+
+```python
+# WRONG - restates the signature, documents nothing
+def bootstrap_delta_ci(reference, test, scale, n_bootstrap, seed, alpha):
+    """Returns the confidence interval for the difference between two means."""
+
+# RIGHT - explains the mechanism and the reason, then the contract
+def bootstrap_delta_ci(
+    reference: np.ndarray,
+    test: np.ndarray,
+    scale: str,
+    n_bootstrap: int,
+    seed: int,
+    alpha: float,
+) -> tuple[float, float]:
+    """Percentile bootstrap CI for the difference between two group means.
+
+    Resamples within each group separately rather than across both, which is what
+    lets the interval reflect replicate spread without assuming the two groups
+    share a variance. With 'log2fc' an iteration is dropped when either resampled
+    mean is non-positive, because the ratio is undefined there. The generator is
+    seeded, so a rerun reproduces the interval exactly.
+
+    Parameters:
+        reference (np.ndarray): control group values; NaN entries are dropped.
+        test (np.ndarray): treated group values; NaN entries are dropped.
+        scale (str): 'log2fc' for a ratio, anything else for a plain difference.
+        n_bootstrap (int): number of resampling iterations.
+        seed (int): seed for the random generator, making the interval reproducible.
+        alpha (float): two-sided level; the interval spans the alpha/2 percentiles.
+
+    Returns:
+        tuple[float, float]: (ci_lower, ci_upper), or (nan, nan) when either group
+        has fewer than two finite values or every iteration was undefined.
+    """
+```
+
+Specific cases:
+
+- **Functions returning None.** Still write a `Returns:` section, and say what the side effect was: `None: the file is written as a side effect.` Silence reads as an oversight.
+- **`Config` dataclasses.** Document every field under `Parameters:`, in declaration order, phrased against the YAML key the user actually edits. This is the second half of the config documentation; the first half is the one-line comment in the YAML itself (§8.6).
+- **Exception classes.** Document the constructor argument: `*args (object): forwarded to Exception; a message naming the file and the offending columns.`
+- **Module docstrings.** No sections — one paragraph on what the module is for and one on the approach it takes.
+- **Do not restate types that are already annotated** as a substitute for explanation. The type in the section is there for the reader; the purpose text is the part that carries information.
 
 ## 7. Design principles
 
@@ -321,6 +373,9 @@ Do not report a task as complete until every item is verified:
 - [ ] No module imports another module; shared code is generic only and lives in `common.py`.
 - [ ] `run()` reads as load → validate → process → write, in one screen.
 - [ ] Every function has full type annotations.
+- [ ] Every function, class and module has a docstring whose summary explains the mechanism or the reason, not the result.
+- [ ] Every function and class docstring has explicit `Parameters:` and `Returns:` sections, plus `Raises:` where a failure is part of the contract.
+- [ ] Every `Config` field is documented, in declaration order, against the YAML key it maps to.
 - [ ] No `print()`; all output goes through `logging`.
 - [ ] No bare `except:` or swallowed exceptions.
 - [ ] No hardcoded column/variable names, units, IDs or schemas anywhere in `src/`.
