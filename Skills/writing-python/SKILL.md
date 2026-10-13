@@ -110,9 +110,34 @@ These five rules override any convenience shortcut. Check them first when review
 
 ### 6.1 Docstring structure
 
-PEP 257 form: triple double-quotes, a one-line summary, a blank line, then the body.
+**The style is numpydoc (NumPy style), not Google style.** This is not cosmetic:
+it is what makes the docstrings render as parameter tables under Sphinx with the
+`numpydoc` extension, which is the toolchain Read the Docs builds these projects
+with. Google-style `Parameters:` headings are silently swallowed into the
+description by `numpydoc`, which then reports a fully documented function as
+undocumented (`PR01 Parameters not documented`, `RT01 No Returns section found`).
 
-**Every function and class docstring carries explicit `Parameters:` and `Returns:` sections**, naming the type and the purpose of each entry. Add a `Raises:` section whenever a failure is part of the contract — which, in this architecture, means any function that can raise `ConfigError` or `DataError`.
+PEP 257 form: triple double-quotes, a one-line summary, a blank line, then the body.
+numpydoc adds the section grammar on top of it:
+
+- **Section headings are underlined with hyphens**, never terminated with a colon:
+  `Parameters` on one line, `----------` on the next, matching its length.
+- **Each entry is `name : type`** on its own line — space before the colon — with the
+  description **indented four spaces on the following line**. Never `name (type): text`.
+- **The short summary is ONE line**, written as an infinitive (`Compute ...`, not
+  `Computes ...` or `Uses a single pass ...`), and does not repeat the function name.
+- **The mechanism and the reasoning go BELOW that line**, in the extended summary, or
+  in a `Notes` section when they amount to background theory or derivation. The
+  how/why rule is unchanged — only its position is fixed.
+- When referring to a parameter elsewhere in the docstring, wrap its name in single
+  backticks.
+- Keep docstring lines to 75 characters, which is narrower than the code limit.
+
+**Every function and class docstring carries explicit `Parameters` and `Returns` sections**, naming the type and the purpose of each entry. Add a `Raises` section whenever a failure is part of the contract — which, in this architecture, means any function that can raise `ConfigError` or `DataError`. numpydoc asks that `Raises` be used judiciously; in this architecture a declared `ConfigError`/`DataError` contract always qualifies.
+
+Section order is fixed by numpydoc: short summary, extended summary, `Parameters`,
+`Returns` (or `Yields` for a generator), `Raises`, `See Also`, `Notes`, `References`,
+`Examples`.
 
 The summary and body explain *how* the code works or *why* that approach was chosen. A docstring that only restates the return value is the anti-pattern:
 
@@ -132,32 +157,58 @@ def bootstrap_delta_ci(
 ) -> tuple[float, float]:
     """Percentile bootstrap CI for the difference between two group means.
 
-    Resamples within each group separately rather than across both, which is what
-    lets the interval reflect replicate spread without assuming the two groups
-    share a variance. With 'log2fc' an iteration is dropped when either resampled
-    mean is non-positive, because the ratio is undefined there. The generator is
-    seeded, so a rerun reproduces the interval exactly.
+    Resamples within each group separately rather than across both, which is
+    what lets the interval reflect replicate spread without assuming the two
+    groups share a variance. With 'log2fc' an iteration is dropped when either
+    resampled mean is non-positive, because the ratio is undefined there. The
+    generator is seeded, so a rerun reproduces the interval exactly.
 
-    Parameters:
-        reference (np.ndarray): control group values; NaN entries are dropped.
-        test (np.ndarray): treated group values; NaN entries are dropped.
-        scale (str): 'log2fc' for a ratio, anything else for a plain difference.
-        n_bootstrap (int): number of resampling iterations.
-        seed (int): seed for the random generator, making the interval reproducible.
-        alpha (float): two-sided level; the interval spans the alpha/2 percentiles.
+    Parameters
+    ----------
+    reference : np.ndarray
+        Control group values; NaN entries are dropped.
+    test : np.ndarray
+        Treated group values; NaN entries are dropped.
+    scale : str
+        'log2fc' for a ratio, anything else for a plain difference.
+    n_bootstrap : int
+        Number of resampling iterations.
+    seed : int
+        Seed for the random generator, making the interval reproducible.
+    alpha : float
+        Two-sided level; the interval spans the alpha/2 percentiles.
 
-    Returns:
-        tuple[float, float]: (ci_lower, ci_upper), or (nan, nan) when either group
-        has fewer than two finite values or every iteration was undefined.
+    Returns
+    -------
+    tuple[float, float]
+        (ci_lower, ci_upper), or (nan, nan) when either group has fewer than
+        two finite values or every iteration was undefined.
     """
 ```
 
 Specific cases:
 
-- **Functions returning None.** Still write a `Returns:` section, and say what the side effect was: `None: the file is written as a side effect.` Silence reads as an oversight.
-- **`Config` dataclasses.** Document every field under `Parameters:`, in declaration order, phrased against the YAML key the user actually edits. This is the second half of the config documentation; the first half is the one-line comment in the YAML itself (§8.6).
-- **Exception classes.** Document the constructor argument: `*args (object): forwarded to Exception; a message naming the file and the offending columns.`
+- **Functions returning None.** Still write a `Returns` section, and say what the side effect was:
+  ```
+  Returns
+  -------
+  None
+      The file is written as a side effect.
+  ```
+  Silence reads as an oversight.
+- **Generators.** Use `Yields` instead of `Returns`, same form. numpydoc requires the type on every yielded value; the name is optional.
+- **`Config` dataclasses.** Document every field under `Parameters`, in declaration order, phrased against the YAML key the user actually edits. This is the second half of the config documentation; the first half is the one-line comment in the YAML itself (§8.6).
+- **Exception classes.** Document the constructor argument:
+  ```
+  Parameters
+  ----------
+  *args : object
+      Forwarded to Exception; a message naming the file and the offending columns.
+  ```
+  Leave the leading star on the name and give no type for `**kwargs`, as numpydoc specifies.
 - **Module docstrings.** No sections — one paragraph on what the module is for and one on the approach it takes.
+- **Fixed-value parameters.** List the options in braces, default first: `order : {'C', 'F', 'A'}`.
+- **Optional parameters.** `x : int, optional`, or `copy : bool, default True` when the default is a value worth naming.
 - **Do not restate types that are already annotated** as a substitute for explanation. The type in the section is there for the reader; the purpose text is the part that carries information.
 
 ## 7. Design principles
@@ -374,7 +425,9 @@ Do not report a task as complete until every item is verified:
 - [ ] `run()` reads as load → validate → process → write, in one screen.
 - [ ] Every function has full type annotations.
 - [ ] Every function, class and module has a docstring whose summary explains the mechanism or the reason, not the result.
-- [ ] Every function and class docstring has explicit `Parameters:` and `Returns:` sections, plus `Raises:` where a failure is part of the contract.
+- [ ] Every function and class docstring has explicit `Parameters` and `Returns` sections, plus `Raises` where a failure is part of the contract.
+- [ ] Every docstring section uses numpydoc syntax: hyphen-underlined headings, `name : type` with the description indented beneath, and a one-line infinitive summary. No colon-terminated `Parameters:` / `Args:` headings anywhere.
+- [ ] `python -m numpydoc.hooks.validate_docstrings` (or a Sphinx build with `numpydoc_validation_checks`) reports no PR01/RT01/SS05/SS06 for new or edited functions.
 - [ ] Every `Config` field is documented, in declaration order, against the YAML key it maps to.
 - [ ] No `print()`; all output goes through `logging`.
 - [ ] No bare `except:` or swallowed exceptions.
