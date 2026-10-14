@@ -1,0 +1,47 @@
+name: ci
+
+# Every gate the project claims, run on every push. A standard that is not in
+# this file is a preference, not a standard.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        # The oldest supported version and the newest. The middle versions add
+        # minutes and have never caught anything these two did not.
+        python-version: ["3.10", "3.13"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+
+      # Lint first: it fails in seconds, and a syntax error makes the test
+      # results meaningless anyway.
+      - name: ruff
+        run: ruff check src tests
+
+      - name: pytest
+        run: pytest -q
+
+      # The docstring schema is part of the suite, but run it standalone too so
+      # a skipped test (a missing numpydoc) cannot pass as a green run.
+      - name: Docstring schema
+        run: python scripts/validate_docstrings.py

@@ -1,0 +1,62 @@
+# The FIRST commit of the repository. Anything committed once is in history
+# forever, so the ignore rules exist before there is anything to ignore.
+
+# --- Python ---------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# --- Environments ---------------------------------------------------------
+.venv/
+venv/
+env/
+.python-version
+
+# --- Tooling caches -------------------------------------------------------
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+.tox/
+
+# --- Documentation --------------------------------------------------------
+# docs/ itself is SOURCE and must be committed (a versioned docs site can only
+# build a tag whose own checkout contains conf.py). These two paths are what
+# sphinx-build generates: the recursive autosummary stubs and the HTML.
+docs/_build/
+docs/api/generated/
+
+# --- Editors and OS -------------------------------------------------------
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# --- Secrets --------------------------------------------------------------
+# No credential ever reaches a commit. Add names here BEFORE the file exists.
+.env
+*.pem
+*.key
+secrets.yaml
+credentials.json
+
+# --- Data and results -----------------------------------------------------
+# The package ships code, not a study. Inputs, outputs and run directories
+# stay outside the repository; what travels is the code that produced them
+# plus the record of how it was run.
+data/
+raw/
+output/
+output-*/
+results/
+*.npy
+*.h5
+*.hdf5
+*.csv
+*.tsv

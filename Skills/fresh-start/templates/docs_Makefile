@@ -1,0 +1,30 @@
+# `make html` is for reading locally. `make strict` is the gate CI runs.
+#
+# -W      a warning fails the build
+# --keep-going  report every fault in one run instead of stopping at the first
+# -a -E   cold build: autosummary stubs are cached, and a cached stub hides a
+#         fault that a fresh run reports
+
+SPHINXBUILD  ?= python -m sphinx
+SOURCEDIR     = .
+BUILDDIR      = _build
+
+.PHONY: help html strict linkcheck clean
+
+help:
+	@echo "html      build the HTML documentation"
+	@echo "strict    build with -W, from scratch — the CI gate"
+	@echo "linkcheck check every external link"
+	@echo "clean     remove the build and the generated API stubs"
+
+html:
+	$(SPHINXBUILD) -b html "$(SOURCEDIR)" "$(BUILDDIR)/html"
+
+strict:
+	$(SPHINXBUILD) -b html -W --keep-going -a -E "$(SOURCEDIR)" "$(BUILDDIR)/html"
+
+linkcheck:
+	$(SPHINXBUILD) -b linkcheck "$(SOURCEDIR)" "$(BUILDDIR)/linkcheck"
+
+clean:
+	rm -rf "$(BUILDDIR)" api/generated

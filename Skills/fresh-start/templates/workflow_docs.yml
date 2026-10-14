@@ -1,0 +1,74 @@
+name: docs
+
+# The documentation build is a GATE, not an artifact factory. `-W` turns every
+# warning into a failure, so a docstring that does not RENDER fails the branch
+# — the one thing an import-based schema checker cannot see.
+
+on:
+  push:
+    branches: [main]
+    paths: ["src/**", "docs/**", "pyproject.toml", ".github/workflows/docs.yml"]
+  pull_request:
+    paths: ["src/**", "docs/**", "pyproject.toml", ".github/workflows/docs.yml"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: pip
+
+      # Compiled GUI/3D stacks (vtk, Qt bindings) import OpenGL at module scope
+      # even with no display attached. Without these the modules that use them
+      # fail to import, autosummary SKIPS them, and they pass by being
+      # invisible rather than by being correct.
+      # Delete this step if the package has no such dependency.
+      - name: System libraries for compiled extras
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgl1 libglx-mesa0 libxrender1
+
+      # Docs are built from the IMPORTED package, so every optional extra is
+      # installed rather than mocked: a module that cannot be imported is not
+      # documented, and an undocumented module cannot fail the build.
+      - name: Install the package and the documentation toolchain
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[all,docs]"
+
+      # Explicit, so a silent autosummary skip becomes a loud failure.
+      - name: Every module must import
+        run: |
+          python - <<'PY'
+          import importlib, pkgutil, sys
+          import PACKAGE_NAME as pkg
+          failed = []
+          names = [m.name for m in pkgutil.walk_packages(pkg.__path__, pkg.__name__ + ".")]
+          for name in names:
+              try:
+                  importlib.import_module(name)
+              except Exception as exc:
+                  failed.append(f"{name}: {type(exc).__name__}: {exc}")
+          print(f"imported {len(names)} modules")
+          if failed:
+              print("\n".join(failed))
+              sys.exit(1)
+          PY
+
+      # -a -E forces a cold build: autosummary stubs are cached, and a cached
+      # stub can hide a fault a fresh run would report.
+      - name: Build with warnings as errors
+        run: python -m sphinx -b html -W --keep-going -a -E docs docs/_build/html
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: html-docs
+          path: docs/_build/html
+          retention-days: 14

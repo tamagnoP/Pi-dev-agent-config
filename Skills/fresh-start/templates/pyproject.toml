@@ -1,0 +1,102 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "PACKAGE_NAME"
+# 0.0.1 reserves the name and promises nothing. It climbs only when a piece of
+# function is proven to work, with the proof recorded in CHANGELOG.md.
+version = "0.0.1"
+description = "ONE LINE, what it does, not what it aspires to."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "AUTHOR", email = "EMAIL" }]
+keywords = []
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+]
+
+# Core = what the main chain genuinely imports. If one module in ten needs it,
+# it is an extra, not a core dependency: every name here is installed by every
+# user on their first `pip install`.
+dependencies = []
+
+[project.optional-dependencies]
+# Group extras by the STAGE or FEATURE that needs them, so a user can install
+# the part they are using and a CI job can install exactly what it tests.
+# heavy = ["some-compiled-stack>=1.0"]
+
+# `all` exists so CI and the docs build can install everything in one name.
+# Uncomment it ONLY once a real extra exists: hatchling refuses a recursive
+# reference to an extra that is not declared, with
+#   ValueError: Unknown recursive dependency group ... : heavy
+# and `pip install -e .` fails before any code runs.
+# all = ["PACKAGE_NAME[heavy]"]
+
+dev = [
+    "pytest>=7.0",
+    "ruff>=0.4",
+    "build>=1.0",
+    "twine>=5.0",
+    # numpydoc lives here as well as in `docs`: tests/test_docstring_schema.py
+    # SKIPS without it, so a dev environment lacking it would run the suite
+    # green while enforcing nothing.
+    "numpydoc>=1.6",
+]
+
+docs = [
+    "sphinx>=7.0",
+    "numpydoc>=1.6",
+    "furo",
+    "myst-parser",
+]
+
+# DECLARE A COMMAND ONLY WHEN ITS MODULE EXISTS. A command advertised early
+# installs cleanly and fails on first use.
+[project.scripts]
+
+[project.urls]
+Homepage = "https://github.com/USER/PACKAGE_NAME"
+Repository = "https://github.com/USER/PACKAGE_NAME"
+Issues = "https://github.com/USER/PACKAGE_NAME/issues"
+Changelog = "https://github.com/USER/PACKAGE_NAME/blob/main/CHANGELOG.md"
+
+# src/ layout: without it, `import PACKAGE_NAME` in the tests can resolve to the
+# working directory instead of the installed package, and the suite passes
+# against code that was never packaged.
+[tool.hatch.build.targets.wheel]
+packages = ["src/PACKAGE_NAME"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src/PACKAGE_NAME", "tests", "README.md", "CHANGELOG.md", "LICENSE"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+# An explicit set, so the documented `ruff check src tests` is a gate a human
+# can act on. On defaults ruff reports everything and the command becomes
+# noise nobody runs.
+#
+#   E4/E7/E9  import placement, statement and syntax errors
+#   F         undefined names, unused imports and variables
+#   W292      no newline at end of file
+#   RUF100    a noqa that no longer suppresses anything
+#   I001      unsorted imports
+#   ARG       an argument accepted and never used
+select = ["E4", "E7", "E9", "F", "W292", "RUF100", "I001", "ARG"]
+
+[tool.ruff.lint.per-file-ignores]
+# Two patterns that are correct in a test and defects anywhere else:
+#   ARG   a test double takes the signature of what it stands in for
+#   E402  pytest.importorskip() must run BEFORE the imports it guards
+"tests/**" = ["ARG001", "ARG002", "ARG005", "E402"]
