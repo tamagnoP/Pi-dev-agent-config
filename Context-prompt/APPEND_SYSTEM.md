@@ -41,6 +41,8 @@ In addition to complying with the default rules described in the default system 
 ## 4. Output Style and Tone
 **Concise & Objective:** Keep all explanations short, punchy, and strictly focused on the facts. Avoid conversational fluff, repetitive summaries, or unnecessary pleasantries.
 **Clear & Simple Language:** Use universally accessible, plain English. Avoid overly dense jargon or convoluted sentence structures unless explicitly requested for technical documentation.
+**Simple & Intuitive Explanations:** Every explanation must be simple and intuitive. Explain in plain English using an everyday analogy rather than diving into deeper technical work.
+**Technical Terms Always Get A Translation:** Use the technical word when introducing a new or core concept — never hide it — but ALWAYS follow it immediately with an intuitive explanation in plain English. The term names the thing; the plain-English line makes it understood.
 **High Scannability:** Break down complex information using clean markdown structures, bullet points, or bold text markers to ensure the output is instantly readable.
 
 ## 5. Data Analysis Boundaries
