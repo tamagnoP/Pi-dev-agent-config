@@ -5,12 +5,13 @@ build-backend = "hatchling.build"
 [project]
 name = "PACKAGE_NAME"
 # 0.0.1 reserves the name and promises nothing. It climbs only when a piece of
-# function is proven to work, with the proof recorded in CHANGELOG.md.
+# function is proven to work, with the proof recorded in CHANGELOG.md. The
+# ladder lives in TODO.md.
 version = "0.0.1"
-description = "ONE LINE, what it does, not what it aspires to."
+description = "ONE_LINE"
 readme = "README.md"
-requires-python = ">=3.10"
-license = "MIT"
+requires-python = ">=PY_MIN"
+license = "LICENSE_ID"
 license-files = ["LICENSE"]
 authors = [{ name = "AUTHOR", email = "EMAIL" }]
 keywords = []
@@ -31,11 +32,11 @@ dependencies = []
 # heavy = ["some-compiled-stack>=1.0"]
 
 # `all` exists so CI and the docs build can install everything in one name.
-# Uncomment it ONLY once a real extra exists: hatchling refuses a recursive
-# reference to an extra that is not declared, with
-#   ValueError: Unknown recursive dependency group ... : heavy
-# and `pip install -e .` fails before any code runs.
-# all = ["PACKAGE_NAME[heavy]"]
+# It starts empty and gains one "PACKAGE_NAME[extra]" entry per extra declared
+# above. Reference an extra ONLY after it is declared: hatchling refuses a
+# recursive reference to an unknown extra and `pip install -e .` fails before
+# any code runs.
+all = []
 
 dev = [
     "pytest>=7.0",
@@ -46,6 +47,9 @@ dev = [
     # SKIPS without it, so a dev environment lacking it would run the suite
     # green while enforcing nothing.
     "numpydoc>=1.6",
+    # tests/test_environment.py and tests/test_changelog_version.py read this
+    # file; tomllib is standard library from 3.11 only.
+    "tomli>=2.0; python_version < '3.11'",
 ]
 
 docs = [

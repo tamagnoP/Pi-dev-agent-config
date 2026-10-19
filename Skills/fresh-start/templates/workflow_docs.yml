@@ -22,7 +22,7 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: "PY_MIN"
           cache: pip
 
       # Compiled GUI/3D stacks (vtk, Qt bindings) import OpenGL at module scope

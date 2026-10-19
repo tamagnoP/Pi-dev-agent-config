@@ -41,9 +41,8 @@ def importable_modules(package: object) -> tuple[list[object], list[str]]:
     """Import every submodule of `package`, reporting those that refuse.
 
     A module whose optional dependency is absent is SKIPPED and named rather
-    than failing the run: `fitting/plotting/*` needs `pyvista`, which the core
-    install does not carry, and a checker that fails on a missing extra would
-    be a checker nobody runs.
+    than failing the run: a module behind a heavy extra that the core install
+    does not carry would otherwise make this a checker nobody runs.
 
     Parameters
     ----------
@@ -59,7 +58,7 @@ def importable_modules(package: object) -> tuple[list[object], list[str]]:
     for found in pkgutil.walk_packages(package.__path__, package.__name__ + "."):
         try:
             modules.append(importlib.import_module(found.name))
-        except Exception as exc:          # any import error is a skip, not a failure
+        except Exception as exc:  # any import error is a skip, not a failure
             skipped.append(f"{found.name} ({type(exc).__name__}: {exc})")
     modules.append(package)
     return modules, skipped
@@ -144,7 +143,7 @@ def violations(targets: set[str]) -> dict[str, list[tuple[str, str]]]:
     for target in sorted(targets):
         try:
             report = validate(target)
-        except Exception:                 # an unresolvable name is not a violation
+        except Exception:  # an unresolvable name is not a violation
             continue
         errors = [(code, msg) for code, msg in report["errors"] if code not in EXCLUDED_CHECKS]
         if errors:

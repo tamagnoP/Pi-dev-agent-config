@@ -1,0 +1,14 @@
+# The declared development environment. tests/test_environment.py asserts it
+# agrees with pyproject.toml, so the two cannot drift apart silently.
+#
+# The dev tools are not listed here by name: `.[dev]` installs exactly what
+# pyproject.toml declares, and the test asserts every gate tool is importable
+# in the environment that runs the suite.
+name: PACKAGE_NAME_venv
+channels:
+  - conda-forge
+dependencies:
+  - python=PY_MIN
+  - pip
+  - pip:
+      - -e ".[dev]"

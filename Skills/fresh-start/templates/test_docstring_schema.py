@@ -24,7 +24,7 @@ if str(SCRIPTS) not in sys.path:
 pytest.importorskip(
     "numpydoc",
     reason="numpydoc is the docs toolchain; install the [docs] extra to enforce "
-           "the docstring schema",
+    "the docstring schema",
 )
 
 
@@ -59,11 +59,10 @@ def test_every_public_docstring_matches_the_numpydoc_schema() -> None:
 def test_the_modules_needing_an_optional_dependency_are_named_not_hidden() -> None:
     """Pin the known blind spot: modules that cannot be imported are reported.
 
-    `fitting/plotting/*` imports `pyvista` at module scope, which the core
-    install does not carry, so those modules are skipped rather than checked.
-    They pass by being invisible, not by being correct. This test asserts the
-    skip is REPORTED, so the gap cannot quietly widen to cover a module that
-    should have been checked.
+    A module that imports a heavy extra at module scope is skipped rather
+    than checked when that extra is absent. It passes by being invisible, not
+    by being correct. This test asserts the skip is REPORTED, so the gap
+    cannot quietly widen to cover a module that should have been checked.
 
     Returns
     -------
@@ -79,4 +78,5 @@ def test_the_modules_needing_an_optional_dependency_are_named_not_hidden() -> No
     assert modules, "no module of the package could be imported at all"
     for name in skipped:
         assert "(" in name and ")" in name, (
-            f"a skipped module must carry the reason it was skipped, got {name!r}")
+            f"a skipped module must carry the reason it was skipped, got {name!r}"
+        )
