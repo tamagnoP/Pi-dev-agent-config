@@ -7,9 +7,9 @@ description: Full post-development cleanup pass over a Python codebase — graph
 
 This pass applies the standards in `writing-python`. Read these at the moment named:
 
-- Before scanning or rewriting any docstring: '/path/to/.pi/agent/skills/writing-python/references/docstrings.md`
-- Before Phase 4: `/path/to/.pi/agent/skills/writing-python/references/procedures.md` (refactoring section)
-- Before reporting done: `/path/to/.pi/agent/skills/writing-python/references/checklist.md`
+- Before scanning or rewriting any docstring: '/Users/Office/.pi/agent/skills/writing-python/references/docstrings.md`
+- Before Phase 4: `/Users/Office/.pi/agent/skills/writing-python/references/procedures.md` (refactoring section)
+- Before reporting done: `/Users/Office/.pi/agent/skills/writing-python/references/checklist.md`
 
 ## Phase 1 — Sync the graph
 

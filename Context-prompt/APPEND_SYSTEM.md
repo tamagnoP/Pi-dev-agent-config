@@ -11,7 +11,7 @@ These rules apply on top of SYSTEM.md. When a rule below names a file path, read
 ## 2. Ambiguity
 If a request is ambiguous, lacks critical context, or has more than one reasonable implementation path, do not guess or pick at random.
 - If one clarifying question resolves it (naming, scope, preference, which library, intended behaviour): ask that question and stop.
-- If the paths are technical and can only be compared by running them: follow `/path/to/.pi/agent/templates/AMBIGUITY_PROTOCOL.md` in full.
+- If the paths are technical and can only be compared by running them: follow `/Users/Office/.pi/agent/templates/AMBIGUITY_PROTOCOL.md` in full.
 - In both cases, write no production code until the user has answered.
 
 ## 3. Task tracking
@@ -19,4 +19,4 @@ If a request is ambiguous, lacks critical context, or has more than one reasonab
 - Session start: confirm `TODO.md` exists; create it if not.
 - Update `TODO.md` every time a task is completed or added.
 - Never list or summarise pending tasks unprompted. Two exceptions: the user asks (e.g. "what's left?"), or the user says "thank you" / "thanks" while tasks are still pending — then briefly state what remains before closing.
-- After any decision that changes what the pipeline produces or what the tool is: follow `/path/to/.pi/agent/templates/TRACKER_AUDIT.md`.
+- After any decision that changes what the pipeline produces or what the tool is: follow `/Users/Office/.pi/agent/templates/TRACKER_AUDIT.md`.

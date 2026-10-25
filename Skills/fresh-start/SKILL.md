@@ -8,7 +8,7 @@ description: Bootstrap the repository infrastructure of a brand-new Python packa
 Stand up a new package in the phases below, in order. Each phase ends with a
 **gate**: a command that passes or fails. Do not advance past a failing gate.
 
-Templates live in `/path/to/.pi/agent/skills/fresh-start/templates/`. Each
+Templates live in `/Users/Office/.pi/agent/skills/fresh-start/templates/`. Each
 carries its own rationale as comments, so the *why* ships with the project;
 this page says only what to copy, what to decide, and what gate to run.
 Read a template at the moment its phase copies it, not before.
@@ -120,7 +120,7 @@ Any new ignore carries a written reason.
 ## Phase 6 — Docstrings enforced by a checker
 
 numpydoc from the first docstring. The schema and the writing rules are in
-`/path/to/.pi/agent/skills/writing-python/references/docstrings.md`.
+`/Users/Office/.pi/agent/skills/writing-python/references/docstrings.md`.
 
 Copy `validate_docstrings.py` → `scripts/` and `test_docstring_schema.py` →
 `tests/`. The exclusions and their reasons are in the script's docstring.
@@ -178,9 +178,9 @@ file's header. The version ladder and release requirements are in `TODO.md`.
 
 Copy `TODO.md`; its Bootstrap section is this skill's checklist, so tick items
 there as the gates pass. Create `DECISIONS.md` from
-`/path/to/.pi/agent/templates/DECISIONS_TEMPLATE.md` and an empty
+`/Users/Office/.pi/agent/templates/DECISIONS_TEMPLATE.md` and an empty
 `option-testing/`. Ambiguous choices follow
-`/path/to/.pi/agent/templates/AMBIGUITY_PROTOCOL.md`.
+`/Users/Office/.pi/agent/templates/AMBIGUITY_PROTOCOL.md`.
 
 Provenance in outputs (`run.log`, `config.used.yaml`) belongs to each module
 and is specified in `writing-python`.

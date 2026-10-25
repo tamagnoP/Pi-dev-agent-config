@@ -5,7 +5,7 @@ description: Coding standards and codebase architecture for Python scientific an
 
 # Python Pipeline Standards
 
-Reference files live in `/path/to/.pi/agent/skills/writing-python/references/`. Read each one at the moment named below, not before.
+Reference files live in `/Users/Office/.pi/agent/skills/writing-python/references/`. Read each one at the moment named below, not before.
 
 ## Workflow
 
